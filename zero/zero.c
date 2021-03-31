@@ -8,6 +8,7 @@ void win(void) {
 
 int main(void) {
 	char buffer[16];
+	setbuf(stdout, NULL);
 	printf("Redirect to %p to win!\n", win);
 	printf("Input: ");
 	gets(buffer);
