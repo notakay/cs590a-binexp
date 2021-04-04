@@ -5,27 +5,26 @@
 FROM ubuntu:xenial
 
 RUN apt update
-RUN apt install -y sudo build-essential gcc-multilib coreutils python3 gdb vim nano socat
+RUN apt install -y sudo build-essential gcc-multilib coreutils python3 gdb vim nano socat git
 
 RUN useradd -d /home/ctf/ -m -p ctf -s /bin/bash ctf
 RUN echo "ctf:ctf" | chpasswd
 
 WORKDIR /opt
 
-ADD zero /opt/zero
-WORKDIR /opt/zero
+RUN git clone https://github.com/notakay/cs590a-binexp
+RUN mv cs590a-binexp chal
+
+WORKDIR /opt/chal/zero
 RUN make zero
 
-ADD one /opt/one
-WORKDIR /opt/one
+WORKDIR /opt/chal/one
 RUN make one
 
-ADD two /opt/two
-WORKDIR /opt/two
+WORKDIR /opt/chal/two
 RUN make two
 
-ADD three /opt/three
-WORKDIR /opt/three
+WORKDIR /opt/chal/three
 RUN make three
 
 EXPOSE 10000
@@ -33,11 +32,10 @@ EXPOSE 10001
 EXPOSE 10002
 EXPOSE 10003
 
-WORKDIR /opt
-COPY socat.sh /opt
-RUN chmod +x /opt/socat.sh
+WORKDIR /opt/chal
+RUN chmod +x /opt/chal/socat.sh
 
 # Still buggy, running in detached mode, or simply executing
 # another shell will drop user in root
 # script force switches to user ctf
-ENTRYPOINT sh /opt/socat.sh
+ENTRYPOINT sh /opt/chal/socat.sh
